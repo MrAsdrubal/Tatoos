@@ -50,10 +50,10 @@ class Controlador:
         # 2. Predecir la tonalidad de piel
         tonalidad_predicha = self.modelo.predecir(imagen_procesada)
 
-        # 3. Obtener un tatuaje recomendado
-        tatuaje_recomendado = self.base_datos.obtener_tatuaje_aleatorio(tonalidad_predicha)
+        # 3. Obtener un tatuaje recomendado, en este caso retorna una variable con longitud variable
+        tatuajes_recomendado = self.base_datos.obtener_tatuaje_aleatorio(tonalidad_predicha)
 
-        return tatuaje_recomendado, tonalidad_predicha
+        return tatuajes_recomendado, tonalidad_predicha
 
 
 

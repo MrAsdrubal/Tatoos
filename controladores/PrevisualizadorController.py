@@ -14,7 +14,9 @@ class PrevisualizadorController:
         self.tonalidadPredicha = None
         self.rutaExe = "PrevisualizadorCuello.exe"
         self.textures_folder = "textures"
+        self.path_tatuajes = os.path.join(upload_folder, 'tatuajesSugeridos')
         os.makedirs(self.processed_folder, exist_ok=True)
+        os.makedirs(self.path_tatuajes, exist_ok=True)
 
     def previsualizador(self):
         if 'username' not in session:
@@ -38,19 +40,16 @@ class PrevisualizadorController:
                 file.save(file_path)
                 # Conexión con el controlador que realiza la predicción del modelo realizado.
                 controlador = Controlador(file_path)
-                tatuajeRecomendado, self.tonalidadPredicha = controlador.procesar_imagen_y_recomendar()
+                tatuajesRecomendados, self.tonalidadPredicha = controlador.procesar_imagen_y_recomendar()
                 print("Tonalidad predicha:   " + self.tonalidadPredicha)
 
-                # Guardar la imagen del tatuaje recomendado con nombre fijo
-                tattoo_output_path = os.path.join(self.upload_folder, "t3.jpg")
-                tatuajeRecomendado.datos_Imagen.save(tattoo_output_path)
-
+                # Guardar las imagenes del tatuaje recomendado con nombre fijo
+                self.guardar_imagen(tatuajesRecomendados)
                 # Procesar la imagen con zoom centrado y guardar como processed_piel2.jpg
                 processed_file_path = self.center_zoom_image(file_path, "piel2.jpg")
 
-                # Copiar la imagen procesada y el tatuaje a la carpeta textures
+                # Copiar la imagen procesada en la carpeta textures
                 self.copy_to_textures(processed_file_path, "piel2.jpg")
-                self.copy_to_textures(tattoo_output_path, "t3.png")
 
         return render_template('previsualizador.html',
                                uploaded_image=uploaded_image,
@@ -117,3 +116,12 @@ class PrevisualizadorController:
             print(f"Imagen copiada a {destination_path}")
         except Exception as e:
             print(f"Error al copiar la imagen a textures: {e}")
+
+    def guardar_imagen(self, imagenes):
+        for i, imagen in enumerate(imagenes):
+            # Generar el nombre del archivo usando el índice i
+            nombre_archivo = f"tatuaje_{i + 1}.jpg"
+            # Crear la ruta completa donde se guardará la imagen
+            tattoo_output_path = os.path.join(self.path_tatuajes, nombre_archivo)
+            # Guardar la imagen en la ruta especificada
+            imagen.datos_Imagen.save(tattoo_output_path)

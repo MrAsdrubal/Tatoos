@@ -10,7 +10,8 @@ class BaseDeDatos:
         self.ruta_csv = ruta_csv
         self.ruta_carpeta_imagenes = ruta_carpeta_imagenes
         self.data = self.cargar_csv()
-
+        # Control del número de tatuajes que retorna.
+        self.num_tattoos_returned = 5
     def cargar_csv(self):
         """Carga la base de datos desde el archivo CSV."""
         if not os.path.exists(self.ruta_csv):
@@ -65,4 +66,5 @@ class BaseDeDatos:
         if not tatuajes:
             raise ValueError(f"No se encontraron tatuajes para la tonalidad: {tonalidad}")
 
-        return random.choice(tatuajes)
+            # Seleccionar aleatoriamente hasta self.num_tattoos_returned imágenes
+        return random.sample(tatuajes, min(self.num_tattoos_returned, len(tatuajes)))
