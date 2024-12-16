@@ -22,7 +22,6 @@ class Controlador:
 
         # Definir nombres de archivos y carpetas
         modelo_prediccion_nombre = "model7_resnet18.pth"
-        print(modelo_prediccion_nombre)
         tattoos_csv_nombre = "resultado_analisis.csv"
         directorio_tatuajes_nombre = "Tatuajes"
 

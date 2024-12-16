@@ -5,13 +5,15 @@ import subprocess
 from flask import render_template, request, session, redirect, url_for, send_from_directory, jsonify
 from ModeloIA.LogicaNegocio.Controlador import Controlador
 from ModeloIA.LogicaNegocio.Imagen import Imagen
+from pathlib import Path
 
 class PrevisualizadorController:
     def __init__(self, upload_folder):
         self.upload_folder = upload_folder
         self.processed_folder = os.path.join(upload_folder, 'processed')
         self.tonalidadPredicha = None
-        self.textures_folder = r"C:\\Users\\NW\\Downloads\\PrevisualizadorCuello\\PrevisualizadorCuello\\textures"
+        self.rutaExe = "PrevisualizadorCuello.exe"
+        self.textures_folder = "textures"
         os.makedirs(self.processed_folder, exist_ok=True)
 
     def previsualizador(self):
@@ -34,7 +36,7 @@ class PrevisualizadorController:
                 # Guardar la imagen original como "piel2.jpg"
                 file_path = os.path.join(self.upload_folder, "original_piel2.jpg")
                 file.save(file_path)
-
+                # Conexión con el controlador que realiza la predicción del modelo realizado.
                 controlador = Controlador(file_path)
                 tatuajeRecomendado, self.tonalidadPredicha = controlador.procesar_imagen_y_recomendar()
                 print("Tonalidad predicha:   " + self.tonalidadPredicha)
@@ -90,18 +92,23 @@ class PrevisualizadorController:
         return send_from_directory(self.upload_folder, filename)
 
     def previsualizar_tatuaje(self):
-        # Ruta específica del archivo .exe
-        exe_path = r"C:\\Users\\NW\\Downloads\\PrevisualizadorCuello\\PrevisualizadorCuello\\PrevisualizadorCuello.exe"
+
+        directorioModelo3D = Path(__file__).resolve().parent.parent
+
+        # Construir rutas completas utilizando Path
+        self.rutaExe = str(directorioModelo3D / "Modelo3D" /self.rutaExe)
         try:
             # Ejecutar el archivo .exe usando subprocess
-            subprocess.Popen(exe_path, shell=True)
+            subprocess.Popen(self.rutaExe, shell=True)
             return jsonify({"message": "Aplicación ejecutada correctamente"})
         except Exception as e:
             print(f"Error al ejecutar el archivo: {e}")
             return jsonify({"message": "Error al ejecutar la aplicación"}), 500
 
     def copy_to_textures(self, source_path, target_name):
-        # Copiar una imagen al directorio de textures con un nombre fijo sin borrar el original
+        # Copiar una imagen al directorio de textures con un nombre fijo sin borrar el
+        directorioModelo3D = Path(__file__).resolve().parent.parent
+        self.textures_folder = str(directorioModelo3D / "Modelo3D" /self.textures_folder)
         destination_path = os.path.join(self.textures_folder, target_name)
         try:
             # Copiar el archivo sin eliminar el original
