@@ -1,6 +1,7 @@
 import torch
+from pathlib import Path
 from PIL import Image
-from Imagen import Imagen  # Asegúrate de que esta importación sea válida.
+from ModeloIA.LogicaNegocio.Imagen import Imagen  # Asegúrate de que esta importación sea válida.
 
 class ModeloPrediccionPiel:
     """

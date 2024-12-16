@@ -6,7 +6,7 @@ class Imagen:
     def __init__(self, ruta_Imagen):
         self.ruta_Imagen = ruta_Imagen
         self.datos_Imagen = None
-
+        self.cargarImagen()
     def cargarImagen(self):
         if not os.path.exists(self.ruta_Imagen):
             raise FileNotFoundError(f"La imagen no existe: {self.ruta_Imagen}")

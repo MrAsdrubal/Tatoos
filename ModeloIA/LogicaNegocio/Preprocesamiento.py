@@ -1,5 +1,5 @@
 import torchvision.transforms as transforms
-from Imagen import Imagen
+from ModeloIA.LogicaNegocio.Imagen import Imagen
 import torch
 
 class Preprocesamiento:
