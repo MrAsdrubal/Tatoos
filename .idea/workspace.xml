@@ -6,8 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="b3b3b01f-3aa4-4986-87fa-1b7a314bc411" name="Changes" comment="Carga de diferentes tatuajes a escoger">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modelo3D/textures/t3.png" beforeDir="false" afterPath="$PROJECT_DIR$/Modelo3D/textures/t3.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ModeloIA/LogicaNegocio/Controlador.py" beforeDir="false" afterPath="$PROJECT_DIR$/ModeloIA/LogicaNegocio/Controlador.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Modelo3D/textures/piel2.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/Modelo3D/textures/piel2.jpg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/controladores/PrevisualizadorController.py" beforeDir="false" afterPath="$PROJECT_DIR$/controladores/PrevisualizadorController.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/tatuajesSugeridos/tatuaje_1.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/static/tatuajesSugeridos/tatuaje_1.jpg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/tatuajesSugeridos/tatuaje_2.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/static/tatuajesSugeridos/tatuaje_2.jpg" afterDir="false" />
@@ -15,7 +14,8 @@
       <change beforePath="$PROJECT_DIR$/static/tatuajesSugeridos/tatuaje_4.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/static/tatuajesSugeridos/tatuaje_4.jpg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/tatuajesSugeridos/tatuaje_5.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/static/tatuajesSugeridos/tatuaje_5.jpg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/tatuajesSugeridos/tatuaje_6.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/static/tatuajesSugeridos/tatuaje_6.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/previsualizador.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/previsualizador.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/uploads/original_piel2.png" beforeDir="false" afterPath="$PROJECT_DIR$/uploads/original_piel2.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/uploads/processed/piel2.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/uploads/processed/piel2.jpg" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -106,7 +106,7 @@
       <workItem from="1734458838043" duration="38000" />
       <workItem from="1734459339672" duration="7529000" />
       <workItem from="1734467025576" duration="529000" />
-      <workItem from="1734467667847" duration="3643000" />
+      <workItem from="1734467667847" duration="4601000" />
     </task>
     <task id="LOCAL-00001" summary="Acoplación ejecutable del modelo 3D en el proyecto.">
       <option name="closed" value="true" />
@@ -140,7 +140,15 @@
       <option name="project" value="LOCAL" />
       <updated>1734467970464</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Carga de diferentes tatuajes a escoger">
+      <option name="closed" value="true" />
+      <created>1734471613208</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1734471613208</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -153,7 +161,7 @@
     <option name="LAST_COMMIT_MESSAGE" value="Carga de diferentes tatuajes a escoger" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/TattooPreview$app.coverage" NAME="app Coverage Results" MODIFIED="1734470750256" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/TattooPreview$app.coverage" NAME="app Coverage Results" MODIFIED="1734471950599" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/TattooPreview$PrevisualizadorController.coverage" NAME="PrevisualizadorController Coverage Results" MODIFIED="1734469363156" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/controladores" />
     <SUITE FILE_PATH="coverage/TattooPreview$Preprocesamiento.coverage" NAME="Preprocesamiento Coverage Results" MODIFIED="1734453041347" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ModeloIA/LogicaNegocio" />
   </component>

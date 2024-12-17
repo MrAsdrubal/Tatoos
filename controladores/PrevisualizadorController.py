@@ -7,6 +7,7 @@ from pandas.core.interchange.from_dataframe import primitive_column_to_ndarray
 from ModeloIA.LogicaNegocio.Controlador import Controlador
 from pathlib import Path
 from PIL import Image
+from flask import session
 
 
 from ModeloIA.LogicaNegocio.Preprocesamiento import Preprocesamiento
@@ -25,7 +26,6 @@ class PrevisualizadorController:
         self.path_tatuajes = os.path.join(self.static_folder, 'tatuajesSugeridos')
         os.makedirs(self.processed_folder, exist_ok=True)
         os.makedirs(self.path_tatuajes, exist_ok=True)
-
 
     def previsualizador(self):
         if 'username' not in session:
@@ -46,24 +46,26 @@ class PrevisualizadorController:
                 return render_template('previsualizador.html', error='No se seleccionó ninguna imagen')
 
             if file:
-
                 file_path = os.path.join(self.upload_folder, nombre_imagen_original)
-                # file es el archivo y filepath la ruta en la que se va a guardar.
                 ruta_guardado_original = self.validar_y_convertir_a_png(file, file_path)
                 processed_file_path = self.center_zoom_image(file_path, nombre_imagen_procesada)
-                print(processed_file_path)
-                # Proceso de instantiation del modelo
+
+                # Proceso de predicción
                 self.controlador = Controlador(processed_file_path)
                 tatuajesRecomendados, self.tonalidadPredicha = self.controlador.procesar_imagen_y_recomendar()
-                print("Tonalidad predicha: " + self.tonalidadPredicha)
-                # Ahí se configura el procesamiento para obtener la muestra del color
+
+                # Guardar la tonalidad en la sesión
+                session['tonalidad_predicha'] = self.tonalidadPredicha
+                print("Tonalidad predicha guardada en sesión:", self.tonalidadPredicha)
+                print(session['tonalidad_predicha'] )
+
+                # Procesamiento adicional
                 Imagen = Image.open(processed_file_path)
-                MuestraTonalidadFinal = Preprocesamiento.resalte_tonalidad_piel(Imagen, self.tonalidadPredicha )
+                MuestraTonalidadFinal = Preprocesamiento.resalte_tonalidad_piel(Imagen, self.tonalidadPredicha)
                 MuestraTonalidadFinal.save(processed_file_path)
+
                 self.guardar_imagen(tatuajesRecomendados)
                 self.copy_to_textures(processed_file_path, nombre_imagen_procesada)
-
-
 
         # Cargar imágenes desde la carpeta tatuajesSugeridos
         for filename in os.listdir(self.path_tatuajes):
@@ -212,7 +214,7 @@ class PrevisualizadorController:
         try:
             print("Refresco tatuaje")
             # Verificar si tonalidadPredicha está disponible
-            self.tonalidadPredicha = "claro"
+            print(self.tonalidadPredicha)
             if self.tonalidadPredicha is None:
                 return jsonify({"error": "Tonalidad de piel no está definida"}), 500
 
