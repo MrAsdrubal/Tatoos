@@ -17,7 +17,7 @@ auth_controller = AuthController(users_model)
 previsualizador_controller = PrevisualizadorController(app.config['UPLOAD_FOLDER'])
 
 # Configuración de la carpeta estática para CSS
-STATIC_FOLDER = 'static/css'
+STATIC_FOLDER = 'static'
 os.makedirs(STATIC_FOLDER, exist_ok=True)
 
 # Rutas
@@ -28,6 +28,9 @@ app.add_url_rule('/logout', 'logout', auth_controller.logout)
 app.add_url_rule('/previsualizador', 'previsualizador', previsualizador_controller.previsualizador, methods=['GET', 'POST'])
 app.add_url_rule('/uploads/<filename>', 'uploaded_file', previsualizador_controller.uploaded_file)
 app.add_url_rule('/previsualizar_tatuaje', 'previsualizar_tatuaje', previsualizador_controller.previsualizar_tatuaje, methods=['POST'])
+app.add_url_rule('/preparar_tatuaje', 'preparar_tatuaje', previsualizador_controller.preparar_tatuaje, methods=['POST'])
+
+app.add_url_rule('/refrescar_tatuaje', 'refrescar_tatuaje', previsualizador_controller.refrescar_tatuaje, methods=['GET' 'POST'])
 
 if __name__ == '__main__':
     app.run(debug=True)

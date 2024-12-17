@@ -4,26 +4,23 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b3b3b01f-3aa4-4986-87fa-1b7a314bc411" name="Changes" comment="Ajuste de recomendaciones de tatuajes dinámico">
-      <change afterPath="$PROJECT_DIR$/uploads/t3.jpg" afterDir="false" />
+    <list default="true" id="b3b3b01f-3aa4-4986-87fa-1b7a314bc411" name="Changes" comment="Mejora - front-end">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modelo3D/OpenGL.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Modelo3D/OpenGL.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Modelo3D/PrevisualizadorCuello.exe" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Modelo3D/textures/piel2.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/Modelo3D/textures/piel2.jpg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Modelo3D/textures/t3.png" beforeDir="false" afterPath="$PROJECT_DIR$/Modelo3D/textures/t3.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ModeloIA/LogicaNegocio/DataSet.py" beforeDir="false" afterPath="$PROJECT_DIR$/ModeloIA/LogicaNegocio/DataSet.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ModeloIA/LogicaNegocio/Preprocesamiento.py" beforeDir="false" afterPath="$PROJECT_DIR$/ModeloIA/LogicaNegocio/Preprocesamiento.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ModeloIA/LogicaNegocio/Controlador.py" beforeDir="false" afterPath="$PROJECT_DIR$/ModeloIA/LogicaNegocio/Controlador.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/controladores/PrevisualizadorController.py" beforeDir="false" afterPath="$PROJECT_DIR$/controladores/PrevisualizadorController.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/login.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/previsualizador.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/previsualizador.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/register.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/register.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/uploads/original_piel2.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/uploads/original_piel2.jpg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/uploads/processed/piel2.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/uploads/processed/piel2.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/tatuajesSugeridos/tatuaje_1.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/uploads/tatuajesSugeridos/tatuaje_1.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/tatuajesSugeridos/tatuaje_2.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/uploads/tatuajesSugeridos/tatuaje_2.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/tatuajesSugeridos/tatuaje_3.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/uploads/tatuajesSugeridos/tatuaje_3.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/tatuajesSugeridos/tatuaje_4.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/uploads/tatuajesSugeridos/tatuaje_4.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/tatuajesSugeridos/tatuaje_5.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/uploads/tatuajesSugeridos/tatuaje_5.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/uploads/t3.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/uploads/tatuajesSugeridos/tatuaje_1.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/uploads/tatuajesSugeridos/tatuaje_2.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/uploads/tatuajesSugeridos/tatuaje_3.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/uploads/tatuajesSugeridos/tatuaje_4.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/uploads/tatuajesSugeridos/tatuaje_5.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/uploads/tatuajesSugeridos/tatuaje_6.jpg" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,22 +50,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.PrevisualizadorController.executor&quot;: &quot;Run&quot;,
-    &quot;Python.app.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/EPN/2024-B/IA/TattooPreview&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "JavaScript Debug.previsualizador.html.executor": "Run",
+    "Python.PrevisualizadorController.executor": "Run",
+    "Python.app.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "C:/EPN/2024-B/IA/TattooPreview/static",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\EPN\2024-B\IA\TattooPreview\static" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -86,7 +89,7 @@
       <option name="presentableId" value="Default" />
       <updated>1734364225310</updated>
       <workItem from="1734364226676" duration="7871000" />
-      <workItem from="1734409382686" duration="2526000" />
+      <workItem from="1734409382686" duration="14422000" />
     </task>
     <task id="LOCAL-00001" summary="Acoplación ejecutable del modelo 3D en el proyecto.">
       <option name="closed" value="true" />
@@ -96,7 +99,15 @@
       <option name="project" value="LOCAL" />
       <updated>1734368010688</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Mejora - front-end">
+      <option name="closed" value="true" />
+      <created>1734412281026</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1734412281026</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -104,10 +115,11 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Acoplación ejecutable del modelo 3D en el proyecto." />
-    <option name="LAST_COMMIT_MESSAGE" value="Acoplación ejecutable del modelo 3D en el proyecto." />
+    <MESSAGE value="Mejora - front-end" />
+    <option name="LAST_COMMIT_MESSAGE" value="Mejora - front-end" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/TattooPreview$app.coverage" NAME="app Coverage Results" MODIFIED="1734411921550" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/TattooPreview$PrevisualizadorController.coverage" NAME="PrevisualizadorController Coverage Results" MODIFIED="1734410752636" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/controladores" />
+    <SUITE FILE_PATH="coverage/TattooPreview$app.coverage" NAME="app Coverage Results" MODIFIED="1734423885250" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/TattooPreview$PrevisualizadorController.coverage" NAME="PrevisualizadorController Coverage Results" MODIFIED="1734423705357" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/controladores" />
   </component>
 </project>
