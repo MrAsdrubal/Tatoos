@@ -22,7 +22,7 @@ class Controlador:
 
         # Definir nombres de archivos y carpetas
         modelo_prediccion_nombre = "model7_resnet18.pth"
-        tattoos_csv_nombre = "resultado_analisis.csv"
+        tattoos_csv_nombre = "tatuajes.csv"
         directorio_tatuajes_nombre = "Tatuajes"
 
         # Obtener la ruta base del proyecto
@@ -56,7 +56,6 @@ class Controlador:
         return tatuajes_recomendado, tonalidad_predicha
 
     def obtener_actualizacion_tatuajes(self, tonalidad_predicha):
-        print("llegamos aqui")
         tatuajes_recomendado = self.base_datos.obtener_tatuaje_aleatorio(tonalidad_predicha)
         return tatuajes_recomendado
 

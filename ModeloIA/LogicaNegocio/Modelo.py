@@ -16,7 +16,7 @@ class ModeloPrediccionPiel:
         except Exception as e:
             raise ValueError(f"Error al cargar el modelo desde {ruta_modelo}: {e}")
 
-        self.clases = ['claro', 'mestizo', 'moreno']
+        self.clases = ['claro', 'mestizo', 'negro']
 
     def predecir(self, imagen: torch.Tensor) -> str:
         """

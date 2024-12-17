@@ -8,8 +8,6 @@ from ModeloIA.LogicaNegocio.Controlador import Controlador
 from pathlib import Path
 from PIL import Image
 from flask import session
-
-
 from ModeloIA.LogicaNegocio.Preprocesamiento import Preprocesamiento
 
 

@@ -10,6 +10,8 @@ import torch
 
 class Preprocesamiento:
 
+    etiquetas = ["claro", "mestizo", "negro"]
+
     @staticmethod
     def procesar(imagen: Imagen) -> torch.Tensor:
         """
@@ -92,7 +94,7 @@ class Preprocesamiento:
                 average_color_mask = np.full_like(image_bgr, average_color)
                 adjusted_image = cv2.addWeighted(image_bgr, 1 - alpha, average_color_mask, alpha, 0)
 
-            case "moreno":
+            case "negro":
                 alpha = 0.5
                 lower_hsv = np.array([5, 30, 40])
                 upper_hsv = np.array([20, 180, 90])
@@ -111,7 +113,7 @@ class Preprocesamiento:
                 adjusted_image = cv2.addWeighted(smoothed_image, 1 - alpha, average_color_mask, alpha, 0)
 
             case _:
-                raise ValueError("Etiqueta no reconocida. Use 'claro', 'mestizo' o 'moreno'.")
+                raise ValueError("Etiqueta no reconocida. Use 'claro', 'mestizo' o 'negro'.")
 
         # Convertir la imagen ajustada de vuelta a RGB y redimensionar a 32x32
         final_image = Image.fromarray(cv2.cvtColor(adjusted_image, cv2.COLOR_BGR2RGB))
