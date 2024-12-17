@@ -184,20 +184,30 @@
         function refrescarTatuaje() {
             console.log("Iniciando proceso de refresco de tatuajes...");
 
-
-            fetch('/refrescar_tatuaje', { method: 'POST' }) // Llamada al servidor Flask
-                .then(response => response.json()) // Convertir la respuesta a JSON
+            fetch('/refrescar_tatuaje', {method: 'POST'})
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Error al refrescar tatuajes: " + response.statusText);
+                    }
+                    return response.json();  // Convertir respuesta a JSON
+                })
                 .then(data => {
-                    const container = document.querySelector('.tatuajes-container');
-                    container.innerHTML = ''; // Limpiar el contenedor
+                    if (data.error) {
+                        alert("Error: " + data.error);
+                        return;
+                    }
 
-                    // Insertar las nuevas imágenes
+                    // Limpiar el contenedor de tatuajes
+                    const container = document.querySelector('.tatuajes-container');
+                    container.innerHTML = '';  // Limpiar contenido previo
+
+                    // Recorrer la lista de tatuajes actualizados y agregarlos al contenedor
                     data.tatuajes.forEach(tatuaje => {
                         const tatuajeCuadro = document.createElement('div');
                         tatuajeCuadro.classList.add('tatuaje-cuadro');
 
                         const img = document.createElement('img');
-                        img.src = tatuaje;
+                        img.src = tatuaje;  // Ruta de la imagen recibida
                         img.alt = 'Tatuaje recomendado';
                         img.style.width = '150px';
                         img.style.height = 'auto';
@@ -220,6 +230,7 @@
                     alert('Error al refrescar las imágenes.');
                 });
         }
+
 
         // Simula la carga de tatuajes
         function cargarTatuajes() {

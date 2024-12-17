@@ -8,6 +8,7 @@ from ModeloIA.LogicaNegocio.Controlador import Controlador
 from pathlib import Path
 from PIL import Image
 
+
 from ModeloIA.LogicaNegocio.Preprocesamiento import Preprocesamiento
 
 
@@ -205,21 +206,35 @@ class PrevisualizadorController:
 
     def refrescar_tatuaje(self):
         """
-        Actualiza y refresca las imágenes de tatuajes, luego renderiza la página.
+        Actualiza y refresca las imágenes de tatuajes.
         """
-        tattoos = []
-        print("refrdsadsesca")
-        # Obtener tatuajes actualizados
-        tatuajes = self.controlador.obtener_actualizacion_tatuajes(self.tonalidadPredicha)
-        print("terminado")
-        self.guardar_imagen(tatuajes)
 
-        # Generar URLs actualizadas
-        # Cargar imágenes desde la carpeta tatuajesSugeridos
-        for filename in os.listdir(self.path_tatuajes):
-            if filename.lower().endswith(('.jpg', '.jpeg', '.png')):
-                tattoos.append(url_for('static', filename=f'tatuajesSugeridos/{filename}'))
+        try:
+            print("Refresco tatuaje")
+            # Verificar si tonalidadPredicha está disponible
+            self.tonalidadPredicha = "claro"
+            if self.tonalidadPredicha is None:
+                return jsonify({"error": "Tonalidad de piel no está definida"}), 500
 
-        print("terminado")
-        # Renderizar la plantilla
-        return render_template('previsualizador.html', tatuajes=tattoos)
+            print("Proceso de prediccion")
+            # Reinicializar el controlador con la imagen procesada más reciente
+            processed_file_path = os.path.join(self.processed_folder, "piel2.jpg")
+            self.controlador = Controlador(processed_file_path)
+
+            # Obtener tatuajes actualizados
+            print("Obteniendo tatuajes actualizados...")
+            tatuajes = self.controlador.obtener_actualizacion_tatuajes(self.tonalidadPredicha)
+
+            # Guardar las imágenes y generar URLs
+            self.guardar_imagen(tatuajes)
+            tattoos = [
+                url_for('static', filename=f"tatuajesSugeridos/{filename}")
+                for filename in os.listdir(self.path_tatuajes)
+                if filename.lower().endswith(('.jpg', '.jpeg', '.png'))
+            ]
+
+            return jsonify({"tatuajes": tattoos}), 200
+
+        except Exception as e:
+            print(f"Error al refrescar tatuajes: {e}")
+            return jsonify({"error": "Error interno del servidor"}), 500

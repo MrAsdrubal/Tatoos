@@ -56,6 +56,7 @@ class Controlador:
         return tatuajes_recomendado, tonalidad_predicha
 
     def obtener_actualizacion_tatuajes(self, tonalidad_predicha):
+        print("llegamos aqui")
         tatuajes_recomendado = self.base_datos.obtener_tatuaje_aleatorio(tonalidad_predicha)
         return tatuajes_recomendado
 
