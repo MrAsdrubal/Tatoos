@@ -3,9 +3,13 @@ import shutil
 import cv2
 import subprocess
 from flask import render_template, request, session, redirect, url_for, send_from_directory, jsonify
+from pandas.core.interchange.from_dataframe import primitive_column_to_ndarray
 from ModeloIA.LogicaNegocio.Controlador import Controlador
 from pathlib import Path
 from PIL import Image
+
+from ModeloIA.LogicaNegocio.Preprocesamiento import Preprocesamiento
+
 
 class PrevisualizadorController:
     def __init__(self, upload_folder):
@@ -21,13 +25,14 @@ class PrevisualizadorController:
         os.makedirs(self.processed_folder, exist_ok=True)
         os.makedirs(self.path_tatuajes, exist_ok=True)
 
+
     def previsualizador(self):
         if 'username' not in session:
             return redirect(url_for('login'))
 
-        uploaded_image = "original_piel2.jpg"
-        processed_image = "piel2.jpg"
-        tattoo_image = "t3.jpg"
+        nombre_imagen_original = "original_piel2.png"
+        nombre_imagen_procesada = "piel2.jpg"
+        nombre_tatuaje_recomendado = "t3.png"
 
         tatuajes = []  # Lista de imágenes sugeridas
 
@@ -40,14 +45,22 @@ class PrevisualizadorController:
                 return render_template('previsualizador.html', error='No se seleccionó ninguna imagen')
 
             if file:
-                file_path = os.path.join(self.upload_folder, "original_piel2.jpg")
-                self.validar_y_convertir_a_jpg(file, file_path)
-                processed_file_path = self.center_zoom_image(file_path, "piel2.jpg")
+
+                file_path = os.path.join(self.upload_folder, nombre_imagen_original)
+                # file es el archivo y filepath la ruta en la que se va a guardar.
+                ruta_guardado_original = self.validar_y_convertir_a_png(file, file_path)
+                processed_file_path = self.center_zoom_image(file_path, nombre_imagen_procesada)
+                print(processed_file_path)
+                # Proceso de instantiation del modelo
                 self.controlador = Controlador(processed_file_path)
                 tatuajesRecomendados, self.tonalidadPredicha = self.controlador.procesar_imagen_y_recomendar()
                 print("Tonalidad predicha: " + self.tonalidadPredicha)
+                # Ahí se configura el procesamiento para obtener la muestra del color
+                Imagen = Image.open(processed_file_path)
+                MuestraTonalidadFinal = Preprocesamiento.resalte_tonalidad_piel(Imagen, self.tonalidadPredicha )
+                MuestraTonalidadFinal.save(processed_file_path)
                 self.guardar_imagen(tatuajesRecomendados)
-                self.copy_to_textures(processed_file_path, "piel2.jpg")
+                self.copy_to_textures(processed_file_path, nombre_imagen_procesada)
 
 
 
@@ -57,9 +70,9 @@ class PrevisualizadorController:
                 tatuajes.append(url_for('static', filename=f'tatuajesSugeridos/{filename}'))
 
         return render_template('previsualizador.html',
-                               uploaded_image=uploaded_image,
-                               processed_image=processed_image,
-                               tattoo_image=tattoo_image,
+                               uploaded_image=nombre_imagen_original,
+                               processed_image=nombre_imagen_procesada,
+                               tattoo_image=nombre_tatuaje_recomendado,
                                tonalidad_predicha=self.tonalidadPredicha,
                                tatuajes=tatuajes)
 
@@ -97,15 +110,14 @@ class PrevisualizadorController:
         return send_from_directory(self.upload_folder, filename)
 
     def previsualizar_tatuaje(self):
-
-        directorioModelo3D = Path(__file__).resolve().parent.parent
-
         # Construir rutas completas utilizando Path
-        self.rutaExe = str(directorioModelo3D / "Modelo3D" /self.rutaExe)
+        rutaLocalExe = str(self.master_directory / "Modelo3D" /self.rutaExe)
         try:
             #"C:/EPN/2024-B/IA/TattooPreview/Modelo3D/PrevisualizadorTatuajes.exe"
             # Ejecutar el archivo .exe usando subprocess
-            subprocess.Popen(self.rutaExe, shell=True)
+            if self.rutaExe is None:
+                return jsonify({"message": "No existe un tatuaje cargado"})
+            subprocess.Popen(rutaLocalExe, shell=True)
             return jsonify({"message": "Aplicación ejecutada correctamente"})
         except Exception as e:
             print(f"Error al ejecutar el archivo: {e}")
@@ -132,32 +144,33 @@ class PrevisualizadorController:
             # Guardar la imagen en la ruta especificada
             imagen.datos_Imagen.save(tattoo_output_path)
 
-    def validar_y_convertir_a_jpg(self, file, output_filename):
+
+    def validar_y_convertir_a_png(self, file, output_filename):
         """
-        Valida si el archivo es una imagen y lo guarda como .jpg si no lo es.
+        Valida si el archivo es una imagen y lo guarda como .png si no lo es.
 
         Args:
             file: Archivo subido mediante request.files.
-            output_filename: Nombre del archivo final con ruta donde se guardará la imagen.
+            output_filename: Nombre del archivo final con ruta donde se guardara la imagen como .png.
 
         Returns:
-            str: Ruta donde se guardó el archivo convertido o validado.
+            str: Ruta donde se guardo el archivo convertido o validado.
         """
         try:
-            # Verificar si el archivo es una imagen válida
+            # Verificar si el archivo es una imagen valida
             img = Image.open(file)
-            img.verify()  # Verifica si el archivo es una imagen válida
-            file.seek(0)  # Reiniciar el puntero del archivo después de verify()
+            img.verify()  # Verifica si el archivo es una imagen valida
+            file.seek(0)  # Reiniciar el puntero del archivo despues de verify()
 
-            # Verificar la extensión del archivo
+            # Verificar la extension del archivo
             file_ext = os.path.splitext(file.filename)[1].lower()
-            if file_ext not in ['.jpg', '.jpeg']:
-                # Convertir a formato JPG si no lo es
+            if file_ext != '.png':
+                # Convertir a formato PNG si no lo es
                 img = Image.open(file)
-                img.convert("RGB").save(output_filename, "JPEG")
+                img.save(output_filename, "PNG")
                 print(f"Imagen convertida y guardada como: {output_filename}")
             else:
-                # Guardar directamente si ya es JPG
+                # Guardar directamente si ya es PNG
                 file.save(output_filename)
                 print(f"Imagen guardada directamente como: {output_filename}")
 
@@ -165,7 +178,7 @@ class PrevisualizadorController:
 
         except Exception as e:
             print(f"Error al validar o convertir la imagen: {e}")
-            raise ValueError("El archivo no es una imagen válida.")
+            raise ValueError("El archivo no es una imagen valida.")
 
     def preparar_tatuaje(self):
         """
@@ -173,6 +186,7 @@ class PrevisualizadorController:
                 La ruta de la imagen original se recibe desde el frontend.
                 """
         try:
+            file_name = "t3.png"
             data = request.get_json()
             ruta_origen = data.get('ruta_imagen')  # Ruta original de la imagen
             # Eliminar el '/' inicial de ruta_origen si existe
@@ -182,7 +196,7 @@ class PrevisualizadorController:
             if not ruta_origen:
                 return jsonify({"error": "No se recibió la ruta de la imagen"}), 400
             print(f"Imagen cargada como: {ruta_origen}")
-            self.copy_to_textures(ruta_final, "t3.png")
+            self.copy_to_textures(ruta_final, file_name)
             return jsonify({"message": "Imagen preparada exitosamente", "ruta_de_origen": ruta_origen}), 200
 
         except Exception as e:
@@ -191,20 +205,21 @@ class PrevisualizadorController:
 
     def refrescar_tatuaje(self):
         """
-        Devuelve las imágenes actualizadas de tatuajes en formato JSON.
+        Actualiza y refresca las imágenes de tatuajes, luego renderiza la página.
         """
-        tatuajes = []
+        tattoos = []
+        print("refrdsadsesca")
+        # Obtener tatuajes actualizados
+        tatuajes = self.controlador.obtener_actualizacion_tatuajes(self.tonalidadPredicha)
+        print("terminado")
+        self.guardar_imagen(tatuajes)
 
-        # Obtener nuevas imágenes recomendadas
-        if self.controlador:
-            tatuajesRecomendados = self.controlador.obtener_actualizacion_tatuajes(self.tonalidadPredicha)
-            self.guardar_imagen(tatuajesRecomendados)
-
+        # Generar URLs actualizadas
         # Cargar imágenes desde la carpeta tatuajesSugeridos
         for filename in os.listdir(self.path_tatuajes):
             if filename.lower().endswith(('.jpg', '.jpeg', '.png')):
-                tatuajes.append(url_for('static', filename=f'tatuajesSugeridos/{filename}'))
+                tattoos.append(url_for('static', filename=f'tatuajesSugeridos/{filename}'))
 
-        # Devolver las imágenes como JSON
-        return jsonify({'tatuajes': tatuajes})
-
+        print("terminado")
+        # Renderizar la plantilla
+        return render_template('previsualizador.html', tatuajes=tattoos)

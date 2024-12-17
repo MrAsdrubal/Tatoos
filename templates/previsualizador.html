@@ -1,251 +1,257 @@
-    <!DOCTYPE html>
-    <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Previsualizador de Tatuajes</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/previsualizador.css') }}">
-        <style>
-            /* Estilos generales */
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-                font-family: 'Poppins', sans-serif;
-            }
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Previsualizador de Tatuajes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/previsualizador.css') }}">
+    <style>
+        /* Estilos generales */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
 
-            body {
-                background: url('https://media.istockphoto.com/id/154200278/es/vector/cr%C3%A1neo-y-rosas-de-fondo.jpg?s=612x612&w=0&k=20&c=z5rdQ1pGG_ZUcK6tbJcohldArRWIbBj_e2XAZqs8uI0=') no-repeat center center fixed;
-                background-size: cover;
-                color: #eaeaea;
-                line-height: 1.6;
-            }
+        body {
+            background: url('https://media.istockphoto.com/id/154200278/es/vector/cr%C3%A1neo-y-rosas-de-fondo.jpg?s=612x612&w=0&k=20&c=z5rdQ1pGG_ZUcK6tbJcohldArRWIbBj_e2XAZqs8uI0=') no-repeat center center fixed;
+            background-size: cover;
+            color: #eaeaea;
+            line-height: 1.6;
+        }
 
-            header {
-                background: rgba(0, 0, 0, 0.8);
-                color: #fff;
-                padding: 20px 0;
-                text-align: center;
-                font-size: 2rem;
-                letter-spacing: 2px;
-                text-transform: uppercase;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-            }
+        header {
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+            font-size: 2rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
 
-            .container {
-                display: flex;
-                justify-content: space-between;
-                padding: 20px;
-                gap: 20px;
-            }
+        .container {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            gap: 20px;
+        }
 
-            .styled-button {
-                background-color: #c9ab81;
-                color: #fff;
-                padding: 10px;
-                border: none;
-                border-radius: 5px;
-                font-size: 1rem;
-                cursor: pointer;
-                text-transform: uppercase;
-                transition: background 0.3s ease, transform 0.2s ease;
-                width: 100%;
-            }
+        .styled-button {
+            background-color: #c9ab81;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: background 0.3s ease, transform 0.2s ease;
+            width: 100%;
+        }
 
-            .styled-button:hover {
-                background-color: #b29476;
-                transform: translateY(-3px);
-            }
+        .styled-button:hover {
+            background-color: #b29476;
+            transform: translateY(-3px);
+        }
 
-            form {
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-                background: rgba(0, 0, 0, 0.8);
-                color: #f4f4f4;
-                padding: 20px;
-                border-radius: 8px;
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-                width: 100%;
-            }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #f4f4f4;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            width: 100%;
+        }
 
-            form input {
-                padding: 10px;
-                border: none;
-                border-radius: 5px;
-                font-size: 1rem;
-                background-color: #222;
-                color: #fff;
-            }
+        form input {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            background-color: #222;
+            color: #fff;
+        }
 
-            form input::placeholder {
-                color: #bbb;
-            }
+        form input::placeholder {
+            color: #bbb;
+        }
 
-            h2, h3 {
-                text-align: center;
-                color: #000;
-                margin-bottom: 10px;
-            }
+        h2, h3 {
+            text-align: center;
+            color: #000;
+            margin-bottom: 10px;
+        }
 
-            p {
-                text-align: center;
-                color: #000;
-            }
+        p {
+            text-align: center;
+            color: #000;
+        }
 
-            .tatuajes-container {
-                display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                gap: 20px;
-                justify-items: center;
-            }
+        .tatuajes-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            justify-items: center;
+        }
 
-            .tatuaje-cuadro {
-                background: rgba(0, 0, 0, 0.8);
-                border-radius: 10px;
-                padding: 15px;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
-                text-align: center;
-                transition: transform 0.3s ease;
-            }
+        .tatuaje-cuadro {
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
 
-            .tatuaje-cuadro:hover {
-                transform: scale(1.05);
-            }
+        .tatuaje-cuadro:hover {
+            transform: scale(1.05);
+        }
 
-            .tatuaje-cuadro img {
-                width: 100%;
-                height: 150px;
-                object-fit: cover;
-                border-radius: 5px;
-            }
+        .tatuaje-cuadro img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
 
-            .instructions-box {
-                background: rgba(0, 0, 0, 0.8);
-                padding: 20px;
-                border-radius: 8px;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
-                width: 100%;
-            }
+        .instructions-box {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+            width: 100%;
+        }
 
-            .instructions-box h3 {
-                text-align: center;
-                color: #c9ab81;
-                margin-bottom: 15px;
-            }
+        .instructions-box h3 {
+            text-align: center;
+            color: #c9ab81;
+            margin-bottom: 15px;
+        }
 
-            .instructions-box ul {
-                list-style: none;
-                padding: 0;
-            }
+        .instructions-box ul {
+            list-style: none;
+            padding: 0;
+        }
 
-            .instructions-box li {
-                background: #222;
-                margin: 5px 0;
-                padding: 10px;
-                border-radius: 5px;
-                color: #f4f4f4;
-                text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
-            }
+        .instructions-box li {
+            background: #222;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+            color: #f4f4f4;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+        }
 
-            .logout-button {
-                margin-top: 20px;
-                text-align: center;
-            }
+        .logout-button {
+            margin-top: 20px;
+            text-align: center;
+        }
 
-            .logout-button a {
-                display: inline-block;
-                padding: 10px 20px;
-                background-color: #c9ab81;
-                color: #fff;
-                text-decoration: none;
-                border-radius: 5px;
-                transition: background-color 0.3s ease;
-            }
+        .logout-button a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #c9ab81;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
 
-            .logout-button a:hover {
-                background-color: #b29476;
-            }
-            .image-container {
-                text-align: center;
-                margin: 20px auto 30px auto; /* Añade margen inferior */
-                background: #fff; /* Fondo blanco */
-                padding: 15px;
-                border-radius: 10px;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
-                width: 500px;
-                height: 350px;
-                overflow: hidden;
-            }
+        .logout-button a:hover {
+            background-color: #b29476;
+        }
 
-        </style>
-        <script>
-            function refrescarTatuaje() {
-    fetch('/refrescar_tatuaje', { method: 'POST' }) // Llamada a Flask
-        .then(response => response.json()) // Convertir la respuesta a JSON
-        .then(data => {
-            const container = document.querySelector('.tatuajes-container');
-            container.innerHTML = ''; // Limpiar el contenedor
+        .image-container {
+            text-align: center;
+            margin: 20px auto 30px auto; /* Añade margen inferior */
+            background: #fff; /* Fondo blanco */
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+            width: 500px;
+            height: 350px;
+            overflow: hidden;
+        }
 
-            // Insertar las nuevas imágenes
-            data.tatuajes.forEach(tatuaje => {
-                const tatuajeCuadro = document.createElement('div');
-                tatuajeCuadro.classList.add('tatuaje-cuadro');
+    </style>
+    <script>
+        function refrescarTatuaje() {
+            console.log("Iniciando proceso de refresco de tatuajes...");
 
-                const img = document.createElement('img');
-                img.src = tatuaje;
-                img.alt = 'Tatuaje recomendado';
-                img.style.width = '150px';
-                img.style.height = 'auto';
 
-                const button = document.createElement('button');
-                button.classList.add('styled-button');
-                button.textContent = 'Seleccionar Tatuaje';
-                button.onclick = () => prepararTatuaje(tatuaje);
+            fetch('/refrescar_tatuaje', { method: 'POST' }) // Llamada al servidor Flask
+                .then(response => response.json()) // Convertir la respuesta a JSON
+                .then(data => {
+                    const container = document.querySelector('.tatuajes-container');
+                    container.innerHTML = ''; // Limpiar el contenedor
 
-                // Agregar imagen y botón al cuadro
-                tatuajeCuadro.appendChild(img);
-                tatuajeCuadro.appendChild(button);
-                container.appendChild(tatuajeCuadro);
-            });
-        })
-        .catch(error => {
-            console.error('Error al refrescar tatuajes:', error);
-            alert('Error al refrescar las imágenes.');
-        });
-}
+                    // Insertar las nuevas imágenes
+                    data.tatuajes.forEach(tatuaje => {
+                        const tatuajeCuadro = document.createElement('div');
+                        tatuajeCuadro.classList.add('tatuaje-cuadro');
 
+                        const img = document.createElement('img');
+                        img.src = tatuaje;
+                        img.alt = 'Tatuaje recomendado';
+                        img.style.width = '150px';
+                        img.style.height = 'auto';
+
+                        const button = document.createElement('button');
+                        button.classList.add('styled-button');
+                        button.textContent = 'Seleccionar Tatuaje';
+                        button.onclick = () => prepararTatuaje(tatuaje);
+
+                        // Agregar imagen y botón al cuadro
+                        tatuajeCuadro.appendChild(img);
+                        tatuajeCuadro.appendChild(button);
+                        container.appendChild(tatuajeCuadro);
+                    });
+
+                    console.log("Imágenes actualizadas correctamente.");
+                })
+                .catch(error => {
+                    console.error('Error al refrescar tatuajes:', error);
+                    alert('Error al refrescar las imágenes.');
+                });
+        }
 
         // Simula la carga de tatuajes
-            function cargarTatuajes() {
-                const cuadros = document.querySelectorAll('.tatuaje-cuadro img');
-                const loaders = document.querySelectorAll('.tatuaje-cuadro .loader');
+        function cargarTatuajes() {
+            const cuadros = document.querySelectorAll('.tatuaje-cuadro img');
+            const loaders = document.querySelectorAll('.tatuaje-cuadro .loader');
 
-                setTimeout(() => {
-                    loaders.forEach(loader => loader.style.display = 'none');
-                    cuadros.forEach(img => img.style.display = 'block');
-                }, 2000); // Simula 2 segundos de carga
-            }
+            setTimeout(() => {
+                loaders.forEach(loader => loader.style.display = 'none');
+                cuadros.forEach(img => img.style.display = 'block');
+            }, 2000); // Simula 2 segundos de carga
+        }
 
-            function previsualizarTatuaje() {
-                fetch('/previsualizar_tatuaje', { method: 'POST' })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log(data.message);
-                        alert(data.message);
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Error al ejecutar la previsualización del tatuaje.');
-                    });
-            }
-            function prepararTatuaje(rutaImagen){
-                  // Enviar la ruta de la imagen al servidor usando fetch
-                fetch('/preparar_tatuaje', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ ruta_imagen: rutaImagen })
+        function previsualizarTatuaje() {
+            fetch('/previsualizar_tatuaje', {method: 'POST'})
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data.message);
+                    alert(data.message);
                 })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al ejecutar la previsualización del tatuaje.');
+                });
+        }
+
+        function prepararTatuaje(rutaImagen) {
+            // Enviar la ruta de la imagen al servidor usando fetch
+            fetch('/preparar_tatuaje', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ruta_imagen: rutaImagen})
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.message) {
@@ -256,74 +262,75 @@
                         console.error(data.error);
                     }
                 })
-            .catch(error => {
-                console.error("Error al copiar la imagen:", error);
-                alert("Error al copiar la imagen.");
-            });
-            }
+                .catch(error => {
+                    console.error("Error al copiar la imagen:", error);
+                    alert("Error al copiar la imagen.");
+                });
+        }
 
-            window.onload = cargarTatuajes;
-        </script>
-    </head>
-    <body>
-        <header>
-            <h1>Previsualizador de Tatuajes para Cuellos</h1>
-        </header>
-        <div class="container">
-            <!-- Parte Principal -->
-            <div style="flex: 3;">
-                <!-- Subir imagen -->
-                <form method="post" enctype="multipart/form-data">
-                    <label for="imagen">Subir imagen de la piel:</label>
-                    <input type="file" name="imagen" id="imagen" required placeholder="Selecciona una imagen">
-                    <button type="submit" class="styled-button">Subir</button>
-                </form>
-
-
-                <!-- Imagen Procesada -->
-                {% if uploaded_image %}
-                    <h2>Imagen procesada:</h2>
-                    <img src="{{ url_for('uploaded_file', filename=uploaded_image) }}" alt="Imagen procesada"
-                        style="width: 619px; height: 362px; object-fit: cover; margin: 0 auto; display: block;">
-                    <div class="tonalidad-container">
-                        <h3>Tonalidad predicha:</h3>
-                        <p>{{ tonalidad_predicha }}</p>
-                    </div>
-                {% endif %}
+        window.onload = cargarTatuajes;
+    </script>
+</head>
+<body>
+<header>
+    <h1>Previsualizador de Tatuajes para Cuellos</h1>
+</header>
+<div class="container">
+    <!-- Parte Principal -->
+    <div style="flex: 3;">
+        <!-- Subir imagen -->
+        <form method="post" enctype="multipart/form-data">
+            <label for="imagen">Subir imagen de la piel:</label>
+            <input type="file" name="imagen" id="imagen" required placeholder="Selecciona una imagen">
+            <button type="submit" class="styled-button">Subir</button>
+        </form>
 
 
-                <!-- Tatuajes Sugeridos -->
-
-                <h2>Tatuajes sugeridos por el modelo:</h2>
-                <div class="tatuajes-container">
-                    {% for tatuaje in tatuajes %}
-                    <div class="tatuaje-cuadro">
-                        <img src="{{ tatuaje }}" alt="Tatuaje recomendado" style="width: 150px; height: auto;">
-                        <button  onclick="prepararTatuaje('{{ tatuaje }}')" class="styled-button">Seleccionar Tatuaje</button>
-                    </div>
-                    {% endfor %}
-                </div>
-
-                <button onclick = "refrescarTatuaje()" class = "styled-button" style="margin-top: 20px;">Refrescar</button>
-                <button onclick="previsualizarTatuaje()" class="styled-button" style="margin-top: 20px;">Previsualizar Tatuaje</button>
-            </div>
-
-            <!-- Instrucciones -->
-            <div class="instructions-box">
-                <h3>Instrucciones del Programa</h3>
-                <ul>
-                    <li><strong>W, A, S, D:</strong> Mover el enfoque de la cámara</li>
-                    <li><strong>Mouse:</strong> Mover el enfoque de la cámara</li>
-                    <li><strong>I, J, K, L:</strong> Redimensionar el tatuaje</li>
-                    <li><strong>Y, H:</strong> Rotar imagen del tatuaje</li>
-                    <li><strong>Flechas de dirección:</strong> Mover el tatuaje</li>
-                    <li><strong>ESC:</strong> Salir del programa</li>
-                </ul>
-                <!-- Botón para cerrar sesión -->
-                <div class="logout-button">
-                    <a href="/logout">Cerrar sesión</a>
-                </div>
-            </div>
+        <!-- Imagen Procesada -->
+        {% if uploaded_image %}
+        <h2>Imagen procesada:</h2>
+        <img src="{{ url_for('uploaded_file', filename=uploaded_image) }}" alt="Imagen procesada"
+             style="width: 619px; height: 362px; object-fit: cover; margin: 0 auto; display: block;">
+        <div class="tonalidad-container">
+            <h3>Tonalidad predicha:</h3>
+            <p>{{ tonalidad_predicha }}</p>
         </div>
-    </body>
-    </html>
+        {% endif %}
+
+
+        <!-- Tatuajes Sugeridos -->
+
+        <h2>Tatuajes sugeridos por el modelo:</h2>
+        <div class="tatuajes-container">
+            {% for tatuaje in tatuajes %}
+            <div class="tatuaje-cuadro">
+                <img src="{{ tatuaje }}" alt="Tatuaje recomendado" style="width: 150px; height: auto;">
+                <button onclick="prepararTatuaje('{{ tatuaje }}')" class="styled-button">Seleccionar Tatuaje</button>
+            </div>
+            {% endfor %}
+        </div>
+
+        <button onclick="refrescarTatuaje()" class="styled-button" style="margin-top: 20px;">Refrescar</button>
+        <button onclick="previsualizarTatuaje()" class="styled-button" style="margin-top: 20px;">Previsualizar Tatuaje
+        </button>
+    </div>
+
+    <!-- Instrucciones -->
+    <div class="instructions-box">
+        <h3>Instrucciones del Programa</h3>
+        <ul>
+            <li><strong>W, A, S, D:</strong> Mover el enfoque de la cámara</li>
+            <li><strong>Mouse:</strong> Mover el enfoque de la cámara</li>
+            <li><strong>I, J, K, L:</strong> Redimensionar el tatuaje</li>
+            <li><strong>Y, H:</strong> Rotar imagen del tatuaje</li>
+            <li><strong>Flechas de dirección:</strong> Mover el tatuaje</li>
+            <li><strong>ESC:</strong> Salir del programa</li>
+        </ul>
+        <!-- Botón para cerrar sesión -->
+        <div class="logout-button">
+            <a href="/logout">Cerrar sesión</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

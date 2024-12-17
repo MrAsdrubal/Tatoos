@@ -29,8 +29,8 @@ app.add_url_rule('/previsualizador', 'previsualizador', previsualizador_controll
 app.add_url_rule('/uploads/<filename>', 'uploaded_file', previsualizador_controller.uploaded_file)
 app.add_url_rule('/previsualizar_tatuaje', 'previsualizar_tatuaje', previsualizador_controller.previsualizar_tatuaje, methods=['POST'])
 app.add_url_rule('/preparar_tatuaje', 'preparar_tatuaje', previsualizador_controller.preparar_tatuaje, methods=['POST'])
+app.add_url_rule('/refrescar_tatuaje', 'refrescar_tatuaje', previsualizador_controller.refrescar_tatuaje, methods=['GET', 'POST'])
 
-app.add_url_rule('/refrescar_tatuaje', 'refrescar_tatuaje', previsualizador_controller.refrescar_tatuaje, methods=['GET' 'POST'])
 
 if __name__ == '__main__':
     app.run(debug=True)
