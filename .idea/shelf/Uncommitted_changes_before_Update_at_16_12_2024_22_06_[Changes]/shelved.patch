@@ -1,0 +1,214 @@
+Index: controladores/PrevisualizadorController.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import os\r\nimport cv2\r\nimport numpy as np\r\nimport subprocess\r\nfrom flask import render_template, request, session, redirect, url_for, send_from_directory, jsonify\r\nfrom ModeloIA.LogicaNegocio.Controlador import Controlador\r\nfrom ModeloIA.LogicaNegocio.Imagen import Imagen\r\nfrom pathlib import Path\r\n\r\nclass PrevisualizadorController:\r\n    def __init__(self, upload_folder):\r\n        self.upload_folder = upload_folder\r\n        self.processed_folder = os.path.join(upload_folder, 'processed')\r\n        self.tonalidadPredicha = None\r\n        self.rutaExe = \"PrevisualizadorCuello.exe\"\r\n        self.textures_folder = \"textures\"\r\n        self.path_tatuajes = os.path.join(upload_folder, 'tatuajesSugeridos')\r\n        os.makedirs(self.processed_folder, exist_ok=True)\r\n        os.makedirs(self.path_tatuajes, exist_ok=True)\r\n\r\n    def previsualizador(self):\r\n        if 'username' not in session:\r\n            return redirect(url_for('login'))\r\n\r\n        uploaded_image = \"original_piel2.jpg\"\r\n        processed_image = \"piel2.jpg\"\r\n        tattoo_image = \"t3.jpg\"\r\n\r\n        if request.method == 'POST':\r\n            if 'imagen' not in request.files:\r\n                return render_template('previsualizador.html', error='No se seleccionó ninguna imagen')\r\n\r\n            file = request.files['imagen']\r\n            if file.filename == '':\r\n                return render_template('previsualizador.html', error='No se seleccionó ninguna imagen')\r\n\r\n            if file:\r\n                # Guardar la imagen original como \"piel2.jpg\"\r\n                file_path = os.path.join(self.upload_folder, \"original_piel2.jpg\")\r\n                file.save(file_path)\r\n                # Conexión con el controlador que realiza la predicción del modelo realizado.\r\n                controlador = Controlador(file_path)\r\n                tatuajesRecomendados, self.tonalidadPredicha = controlador.procesar_imagen_y_recomendar()\r\n                print(\"Tonalidad predicha:   \" + self.tonalidadPredicha)\r\n\r\n                # Guardar las imagenes del tatuaje recomendado con nombre fijo\r\n                self.guardar_imagen(tatuajesRecomendados)\r\n                # Procesar la imagen con zoom centrado y guardar como processed_piel2.jpg\r\n                processed_file_path = self.center_zoom_image(file_path, \"piel2.jpg\")\r\n\r\n                # Copiar la imagen procesada en la carpeta textures\r\n                self.copy_to_textures(processed_file_path, \"piel2.jpg\")\r\n\r\n        return render_template('previsualizador.html',\r\n                               uploaded_image=uploaded_image,\r\n                               processed_image=processed_image,\r\n                               tattoo_image=tattoo_image,\r\n                               tonalidad_predicha=self.tonalidadPredicha)\r\n\r\n    def center_zoom_image(self, image_path, filename):\r\n        # Leer la imagen con OpenCV\r\n        image = cv2.imread(image_path)\r\n        height, width = image.shape[:2]\r\n\r\n        # Calcular las coordenadas del recorte central con más zoom\r\n        zoom_factor = 0.5  # Ajustado para mayor zoom (0.5 recorta más)\r\n        new_width = int(width * zoom_factor)\r\n        new_height = int(height * zoom_factor)\r\n\r\n        x1 = (width - new_width) // 2\r\n        y1 = (height - new_height) // 2\r\n        x2 = x1 + new_width\r\n        y2 = y1 + new_height\r\n\r\n        # Recortar la imagen\r\n        cropped_image = image[y1:y2, x1:x2]\r\n\r\n        # Redimensionar la imagen recortada al tamaño original\r\n        zoomed_image = cv2.resize(cropped_image, (width, height), interpolation=cv2.INTER_LINEAR)\r\n\r\n        # Guardar la imagen procesada con nombre fijo\r\n        processed_path = os.path.join(self.processed_folder, filename)\r\n        cv2.imwrite(processed_path, zoomed_image)\r\n\r\n        return processed_path\r\n\r\n    def uploaded_file(self, filename):\r\n        # Servir el archivo desde la carpeta 'processed' o la raíz 'uploads'\r\n        if os.path.exists(os.path.join(self.processed_folder, filename)):\r\n            return send_from_directory(self.processed_folder, filename)\r\n        return send_from_directory(self.upload_folder, filename)\r\n\r\n    def previsualizar_tatuaje(self):\r\n\r\n        directorioModelo3D = Path(__file__).resolve().parent.parent\r\n\r\n        # Construir rutas completas utilizando Path\r\n        self.rutaExe = str(directorioModelo3D / \"Modelo3D\" /self.rutaExe)\r\n        try:\r\n            # Ejecutar el archivo .exe usando subprocess\r\n            subprocess.Popen(self.rutaExe, shell=True)\r\n            return jsonify({\"message\": \"Aplicación ejecutada correctamente\"})\r\n        except Exception as e:\r\n            print(f\"Error al ejecutar el archivo: {e}\")\r\n            return jsonify({\"message\": \"Error al ejecutar la aplicación\"}), 500\r\n\r\n    def copy_to_textures(self, source_path, target_name):\r\n        # Copiar una imagen al directorio de textures con un nombre fijo sin borrar el\r\n        directorioModelo3D = Path(__file__).resolve().parent.parent\r\n        self.textures_folder = str(directorioModelo3D / \"Modelo3D\" /self.textures_folder)\r\n        destination_path = os.path.join(self.textures_folder, target_name)\r\n        try:\r\n            # Copiar el archivo sin eliminar el original\r\n            import shutil\r\n            shutil.copy2(source_path, destination_path)\r\n            print(f\"Imagen copiada a {destination_path}\")\r\n        except Exception as e:\r\n            print(f\"Error al copiar la imagen a textures: {e}\")\r\n\r\n    def guardar_imagen(self, imagenes):\r\n        for i, imagen in enumerate(imagenes):\r\n            # Generar el nombre del archivo usando el índice i\r\n            nombre_archivo = f\"tatuaje_{i + 1}.jpg\"\r\n            # Crear la ruta completa donde se guardará la imagen\r\n            tattoo_output_path = os.path.join(self.path_tatuajes, nombre_archivo)\r\n            # Guardar la imagen en la ruta especificada\r\n            imagen.datos_Imagen.save(tattoo_output_path)
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/controladores/PrevisualizadorController.py b/controladores/PrevisualizadorController.py
+--- a/controladores/PrevisualizadorController.py	(revision 0e7efa8d6298469eb387f3b780094848ee8cf86f)
++++ b/controladores/PrevisualizadorController.py	(date 1734402902458)
+@@ -6,13 +6,14 @@
+ from ModeloIA.LogicaNegocio.Controlador import Controlador
+ from ModeloIA.LogicaNegocio.Imagen import Imagen
+ from pathlib import Path
++from ModeloIA.LogicaNegocio.Preprocesamiento import Preprocesamiento
+ 
+ class PrevisualizadorController:
+     def __init__(self, upload_folder):
+         self.upload_folder = upload_folder
+         self.processed_folder = os.path.join(upload_folder, 'processed')
+         self.tonalidadPredicha = None
+-        self.rutaExe = "PrevisualizadorCuello.exe"
++        self.rutaExe = "PrevisualizadorTatuajes.exe"
+         self.textures_folder = "textures"
+         self.path_tatuajes = os.path.join(upload_folder, 'tatuajesSugeridos')
+         os.makedirs(self.processed_folder, exist_ok=True)
+@@ -36,6 +37,7 @@
+ 
+             if file:
+                 # Guardar la imagen original como "piel2.jpg"
++               # Preprocesamiento.procesar()
+                 file_path = os.path.join(self.upload_folder, "original_piel2.jpg")
+                 file.save(file_path)
+                 # Conexión con el controlador que realiza la predicción del modelo realizado.
+@@ -97,6 +99,7 @@
+         # Construir rutas completas utilizando Path
+         self.rutaExe = str(directorioModelo3D / "Modelo3D" /self.rutaExe)
+         try:
++            #"C:/EPN/2024-B/IA/TattooPreview/Modelo3D/PrevisualizadorTatuajes.exe"
+             # Ejecutar el archivo .exe usando subprocess
+             subprocess.Popen(self.rutaExe, shell=True)
+             return jsonify({"message": "Aplicación ejecutada correctamente"})
+Index: ModeloIA/LogicaNegocio/Preprocesamiento.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import torchvision.transforms as transforms\r\nfrom ModeloIA.LogicaNegocio.Imagen import Imagen\r\nimport torch\r\n\r\nclass Preprocesamiento:\r\n\r\n    @staticmethod\r\n    def procesar(imagen: Imagen) -> torch.Tensor:\r\n        \"\"\"\r\n        Realiza el preprocesamiento de la imagen (escalado, normalización, etc.).\r\n\r\n        Args:\r\n            imagen (Imagen): Instancia de la clase Imagen a procesar.\r\n\r\n        Returns:\r\n            Tensor: Imagen procesada lista para la predicción.\r\n        \"\"\"\r\n        from torchvision import transforms\r\n        from PIL import Image\r\n\r\n        # 1. Definir las transformaciones necesarias\r\n        transformaciones = transforms.Compose([\r\n            transforms.Resize((224, 224)),            # Redimensionar la imagen a 224x224\r\n            transforms.ToTensor(),                   # Convertir la imagen a un tensor\r\n            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # Normalización según ImageNet\r\n        ])\r\n\r\n        # 2. Verificar que la imagen está cargada\r\n        if imagen.datos_Imagen is None:\r\n            raise ValueError(\"La imagen no ha sido cargada. Use el método 'cargar' antes de procesarla.\")\r\n\r\n        try:\r\n            # Asegurar que la imagen cargada es un objeto PIL.Image\r\n            imagen_pil = imagen.datos_Imagen.convert('RGB')  # Convertir a RGB si no lo es\r\n        except AttributeError as e:\r\n            raise ValueError(f\"La imagen cargada no es válida: {e}\")\r\n\r\n        # 3. Aplicar las transformaciones\r\n        imagen_tensor = transformaciones(imagen_pil).unsqueeze(0)  # Agregar dimensión de batch\r\n\r\n        return imagen_tensor\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/ModeloIA/LogicaNegocio/Preprocesamiento.py b/ModeloIA/LogicaNegocio/Preprocesamiento.py
+--- a/ModeloIA/LogicaNegocio/Preprocesamiento.py	(revision 0e7efa8d6298469eb387f3b780094848ee8cf86f)
++++ b/ModeloIA/LogicaNegocio/Preprocesamiento.py	(date 1734401853806)
+@@ -4,6 +4,7 @@
+ 
+ class Preprocesamiento:
+ 
++
+     @staticmethod
+     def procesar(imagen: Imagen) -> torch.Tensor:
+         """
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"b3b3b01f-3aa4-4986-87fa-1b7a314bc411\" name=\"Changes\" comment=\"Acoplación ejecutable del modelo 3D en el proyecto.\">\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/ModeloIA/LogicaNegocio/Controlador.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/ModeloIA/LogicaNegocio/Controlador.py\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/ModeloIA/LogicaNegocio/DataSet.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/ModeloIA/LogicaNegocio/DataSet.py\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/controladores/PrevisualizadorController.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/controladores/PrevisualizadorController.py\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/uploads/original_piel2.jpg\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/uploads/processed/piel2.jpg\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/uploads/t3.jpg\" beforeDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"GitHubPullRequestSearchHistory\"><![CDATA[{\r\n  \"lastFilter\": {\r\n    \"state\": \"OPEN\",\r\n    \"assignee\": \"MrAsdrubal\"\r\n  }\r\n}]]></component>\r\n  <component name=\"GithubPullRequestsUISettings\"><![CDATA[{\r\n  \"selectedUrlAndAccountId\": {\r\n    \"url\": \"https://github.com/MrAsdrubal/Tatoos.git\",\r\n    \"accountId\": \"a262901a-689c-4e92-b162-f835063f9000\"\r\n  }\r\n}]]></component>\r\n  <component name=\"ProjectColorInfo\"><![CDATA[{\r\n  \"associatedIndex\": 0\r\n}]]></component>\r\n  <component name=\"ProjectId\" id=\"2qIy8d2T777idtOIETYgfdfPHtx\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\r\n  \"keyToString\": {\r\n    \"Python.PrevisualizadorController.executor\": \"Run\",\r\n    \"Python.app.executor\": \"Run\",\r\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\r\n    \"RunOnceActivity.git.unshallow\": \"true\",\r\n    \"git-widget-placeholder\": \"main\",\r\n    \"last_opened_file_path\": \"C:/EPN/2024-B/IA/TattooPreview\",\r\n    \"node.js.detected.package.eslint\": \"true\",\r\n    \"node.js.detected.package.tslint\": \"true\",\r\n    \"node.js.selected.package.eslint\": \"(autodetect)\",\r\n    \"node.js.selected.package.tslint\": \"(autodetect)\",\r\n    \"nodejs_package_manager_path\": \"npm\",\r\n    \"vue.rearranger.settings.migration\": \"true\"\r\n  }\r\n}]]></component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"bundled-js-predefined-d6986cc7102b-deb605915726-JavaScript-PY-243.22562.180\" />\r\n        <option value=\"bundled-python-sdk-85c76a3b01b3-9a18a617cbe4-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-243.22562.180\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"b3b3b01f-3aa4-4986-87fa-1b7a314bc411\" name=\"Changes\" comment=\"\" />\r\n      <created>1734364225310</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1734364225310</updated>\r\n      <workItem from=\"1734364226676\" duration=\"7871000\" />\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"Acoplación ejecutable del modelo 3D en el proyecto.\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1734368010688</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1734368010688</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"2\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"Acoplación ejecutable del modelo 3D en el proyecto.\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"Acoplación ejecutable del modelo 3D en el proyecto.\" />\r\n  </component>\r\n  <component name=\"com.intellij.coverage.CoverageDataManagerImpl\">\r\n    <SUITE FILE_PATH=\"coverage/TattooPreview$app.coverage\" NAME=\"app Coverage Results\" MODIFIED=\"1734371599007\" SOURCE_PROVIDER=\"com.intellij.coverage.DefaultCoverageFileProvider\" RUNNER=\"coverage.py\" COVERAGE_BY_TEST_ENABLED=\"false\" COVERAGE_TRACING_ENABLED=\"false\" WORKING_DIRECTORY=\"$PROJECT_DIR$\" />\r\n    <SUITE FILE_PATH=\"coverage/TattooPreview$PrevisualizadorController.coverage\" NAME=\"PrevisualizadorController Coverage Results\" MODIFIED=\"1734371583395\" SOURCE_PROVIDER=\"com.intellij.coverage.DefaultCoverageFileProvider\" RUNNER=\"coverage.py\" COVERAGE_BY_TEST_ENABLED=\"false\" COVERAGE_TRACING_ENABLED=\"false\" WORKING_DIRECTORY=\"$PROJECT_DIR$/controladores\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 0e7efa8d6298469eb387f3b780094848ee8cf86f)
++++ b/.idea/workspace.xml	(date 1734404558466)
+@@ -4,14 +4,22 @@
+     <option name="autoReloadType" value="SELECTIVE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="b3b3b01f-3aa4-4986-87fa-1b7a314bc411" name="Changes" comment="Acoplación ejecutable del modelo 3D en el proyecto.">
++    <list default="true" id="b3b3b01f-3aa4-4986-87fa-1b7a314bc411" name="Changes" comment="Ajuste de recomendaciones de tatuajes dinámico">
++      <change afterPath="$PROJECT_DIR$/uploads/t3.jpg" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/ModeloIA/LogicaNegocio/Controlador.py" beforeDir="false" afterPath="$PROJECT_DIR$/ModeloIA/LogicaNegocio/Controlador.py" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/ModeloIA/LogicaNegocio/DataSet.py" beforeDir="false" afterPath="$PROJECT_DIR$/ModeloIA/LogicaNegocio/DataSet.py" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/Modelo3D/OpenGL.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Modelo3D/OpenGL.pdb" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/Modelo3D/PrevisualizadorCuello.exe" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/Modelo3D/textures/piel2.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/Modelo3D/textures/piel2.jpg" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/Modelo3D/textures/t3.png" beforeDir="false" afterPath="$PROJECT_DIR$/Modelo3D/textures/t3.png" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/ModeloIA/LogicaNegocio/Preprocesamiento.py" beforeDir="false" afterPath="$PROJECT_DIR$/ModeloIA/LogicaNegocio/Preprocesamiento.py" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/controladores/PrevisualizadorController.py" beforeDir="false" afterPath="$PROJECT_DIR$/controladores/PrevisualizadorController.py" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/uploads/original_piel2.jpg" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/uploads/processed/piel2.jpg" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/uploads/t3.jpg" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/uploads/original_piel2.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/uploads/original_piel2.jpg" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/uploads/processed/piel2.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/uploads/processed/piel2.jpg" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/uploads/tatuajesSugeridos/tatuaje_1.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/uploads/tatuajesSugeridos/tatuaje_1.jpg" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/uploads/tatuajesSugeridos/tatuaje_2.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/uploads/tatuajesSugeridos/tatuaje_2.jpg" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/uploads/tatuajesSugeridos/tatuaje_3.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/uploads/tatuajesSugeridos/tatuaje_3.jpg" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/uploads/tatuajesSugeridos/tatuaje_4.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/uploads/tatuajesSugeridos/tatuaje_4.jpg" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/uploads/tatuajesSugeridos/tatuaje_5.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/uploads/tatuajesSugeridos/tatuaje_5.jpg" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -21,21 +29,21 @@
+   <component name="Git.Settings">
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+   </component>
+-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+-  "lastFilter": {
+-    "state": "OPEN",
+-    "assignee": "MrAsdrubal"
++  <component name="GitHubPullRequestSearchHistory">{
++  &quot;lastFilter&quot;: {
++    &quot;state&quot;: &quot;OPEN&quot;,
++    &quot;assignee&quot;: &quot;MrAsdrubal&quot;
+   }
+-}]]></component>
+-  <component name="GithubPullRequestsUISettings"><![CDATA[{
+-  "selectedUrlAndAccountId": {
+-    "url": "https://github.com/MrAsdrubal/Tatoos.git",
+-    "accountId": "a262901a-689c-4e92-b162-f835063f9000"
++}</component>
++  <component name="GithubPullRequestsUISettings">{
++  &quot;selectedUrlAndAccountId&quot;: {
++    &quot;url&quot;: &quot;https://github.com/MrAsdrubal/Tatoos.git&quot;,
++    &quot;accountId&quot;: &quot;a262901a-689c-4e92-b162-f835063f9000&quot;
+   }
+-}]]></component>
+-  <component name="ProjectColorInfo"><![CDATA[{
+-  "associatedIndex": 0
+-}]]></component>
++}</component>
++  <component name="ProjectColorInfo">{
++  &quot;associatedIndex&quot;: 0
++}</component>
+   <component name="ProjectId" id="2qIy8d2T777idtOIETYgfdfPHtx" />
+   <component name="ProjectViewState">
+     <option name="hideEmptyMiddlePackages" value="true" />
+@@ -48,7 +56,7 @@
+     "RunOnceActivity.ShowReadmeOnStart": "true",
+     "RunOnceActivity.git.unshallow": "true",
+     "git-widget-placeholder": "main",
+-    "last_opened_file_path": "C:/EPN/2024-B/IA/TattooPreview",
++    "last_opened_file_path": "C:/EPN/2024-B/IA/TattooPreview/uploads/tatuajesSugeridos",
+     "node.js.detected.package.eslint": "true",
+     "node.js.detected.package.tslint": "true",
+     "node.js.selected.package.eslint": "(autodetect)",
+@@ -57,6 +65,14 @@
+     "vue.rearranger.settings.migration": "true"
+   }
+ }]]></component>
++  <component name="RecentsManager">
++    <key name="CopyFile.RECENT_KEYS">
++      <recent name="C:\EPN\2024-B\IA\TattooPreview\uploads\tatuajesSugeridos" />
++    </key>
++    <key name="MoveFile.RECENT_KEYS">
++      <recent name="C:\EPN\2024-B\IA\TattooPreview\uploads" />
++    </key>
++  </component>
+   <component name="SharedIndexes">
+     <attachedChunks>
+       <set>
+@@ -73,7 +89,10 @@
+       <option name="number" value="Default" />
+       <option name="presentableId" value="Default" />
+       <updated>1734364225310</updated>
+-      <workItem from="1734364226676" duration="7871000" />
++      <workItem from="1734364226676" duration="8219000" />
++      <workItem from="1734372654247" duration="307000" />
++      <workItem from="1734394261605" duration="303000" />
++      <workItem from="1734399915098" duration="4329000" />
+     </task>
+     <task id="LOCAL-00001" summary="Acoplación ejecutable del modelo 3D en el proyecto.">
+       <option name="closed" value="true" />
+@@ -83,18 +102,38 @@
+       <option name="project" value="LOCAL" />
+       <updated>1734368010688</updated>
+     </task>
+-    <option name="localTasksCounter" value="2" />
++    <task id="LOCAL-00002" summary="Ajuste de recomendaciones de tatuajes dinámico">
++      <option name="closed" value="true" />
++      <created>1734372358219</created>
++      <option name="number" value="00002" />
++      <option name="presentableId" value="LOCAL-00002" />
++      <option name="project" value="LOCAL" />
++      <updated>1734372358219</updated>
++    </task>
++    <option name="localTasksCounter" value="3" />
+     <servers />
+   </component>
+   <component name="TypeScriptGeneratedFilesManager">
+     <option name="version" value="3" />
+   </component>
++  <component name="Vcs.Log.Tabs.Properties">
++    <option name="TAB_STATES">
++      <map>
++        <entry key="MAIN">
++          <value>
++            <State />
++          </value>
++        </entry>
++      </map>
++    </option>
++  </component>
+   <component name="VcsManagerConfiguration">
+     <MESSAGE value="Acoplación ejecutable del modelo 3D en el proyecto." />
+-    <option name="LAST_COMMIT_MESSAGE" value="Acoplación ejecutable del modelo 3D en el proyecto." />
++    <MESSAGE value="Ajuste de recomendaciones de tatuajes dinámico" />
++    <option name="LAST_COMMIT_MESSAGE" value="Ajuste de recomendaciones de tatuajes dinámico" />
+   </component>
+   <component name="com.intellij.coverage.CoverageDataManagerImpl">
+-    <SUITE FILE_PATH="coverage/TattooPreview$app.coverage" NAME="app Coverage Results" MODIFIED="1734371599007" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+-    <SUITE FILE_PATH="coverage/TattooPreview$PrevisualizadorController.coverage" NAME="PrevisualizadorController Coverage Results" MODIFIED="1734371583395" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/controladores" />
++    <SUITE FILE_PATH="coverage/TattooPreview$app.coverage" NAME="app Coverage Results" MODIFIED="1734403287170" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
++    <SUITE FILE_PATH="coverage/TattooPreview$PrevisualizadorController.coverage" NAME="PrevisualizadorController Coverage Results" MODIFIED="1734402908279" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/controladores" />
+   </component>
+ </project>
+\ No newline at end of file

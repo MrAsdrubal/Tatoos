@@ -6,13 +6,15 @@ from flask import render_template, request, session, redirect, url_for, send_fro
 from ModeloIA.LogicaNegocio.Controlador import Controlador
 from ModeloIA.LogicaNegocio.Imagen import Imagen
 from pathlib import Path
+from PIL import Image
+from ModeloIA.LogicaNegocio.Preprocesamiento import Preprocesamiento
 
 class PrevisualizadorController:
     def __init__(self, upload_folder):
         self.upload_folder = upload_folder
         self.processed_folder = os.path.join(upload_folder, 'processed')
         self.tonalidadPredicha = None
-        self.rutaExe = "PrevisualizadorCuello.exe"
+        self.rutaExe = "PrevisualizadorTatuajes.exe"
         self.textures_folder = "textures"
         self.path_tatuajes = os.path.join(upload_folder, 'tatuajesSugeridos')
         os.makedirs(self.processed_folder, exist_ok=True)
@@ -36,8 +38,9 @@ class PrevisualizadorController:
 
             if file:
                 # Guardar la imagen original como "piel2.jpg"
+                #fileActualizado = Preprocesamiento.normalizar_formato_imagen(file, 'JPEG')
                 file_path = os.path.join(self.upload_folder, "original_piel2.jpg")
-                file.save(file_path)
+                self.validar_y_convertir_a_jpg(file, file_path)
                 # Conexión con el controlador que realiza la predicción del modelo realizado.
                 controlador = Controlador(file_path)
                 tatuajesRecomendados, self.tonalidadPredicha = controlador.procesar_imagen_y_recomendar()
@@ -97,6 +100,7 @@ class PrevisualizadorController:
         # Construir rutas completas utilizando Path
         self.rutaExe = str(directorioModelo3D / "Modelo3D" /self.rutaExe)
         try:
+            #"C:/EPN/2024-B/IA/TattooPreview/Modelo3D/PrevisualizadorTatuajes.exe"
             # Ejecutar el archivo .exe usando subprocess
             subprocess.Popen(self.rutaExe, shell=True)
             return jsonify({"message": "Aplicación ejecutada correctamente"})
@@ -125,3 +129,38 @@ class PrevisualizadorController:
             tattoo_output_path = os.path.join(self.path_tatuajes, nombre_archivo)
             # Guardar la imagen en la ruta especificada
             imagen.datos_Imagen.save(tattoo_output_path)
+
+    def validar_y_convertir_a_jpg(self, file, output_filename):
+        """
+        Valida si el archivo es una imagen y lo guarda como .jpg si no lo es.
+
+        Args:
+            file: Archivo subido mediante request.files.
+            output_filename: Nombre del archivo final con ruta donde se guardará la imagen.
+
+        Returns:
+            str: Ruta donde se guardó el archivo convertido o validado.
+        """
+        try:
+            # Verificar si el archivo es una imagen válida
+            img = Image.open(file)
+            img.verify()  # Verifica si el archivo es una imagen válida
+            file.seek(0)  # Reiniciar el puntero del archivo después de verify()
+
+            # Verificar la extensión del archivo
+            file_ext = os.path.splitext(file.filename)[1].lower()
+            if file_ext not in ['.jpg', '.jpeg']:
+                # Convertir a formato JPG si no lo es
+                img = Image.open(file)
+                img.convert("RGB").save(output_filename, "JPEG")
+                print(f"Imagen convertida y guardada como: {output_filename}")
+            else:
+                # Guardar directamente si ya es JPG
+                file.save(output_filename)
+                print(f"Imagen guardada directamente como: {output_filename}")
+
+            return output_filename
+
+        except Exception as e:
+            print(f"Error al validar o convertir la imagen: {e}")
+            raise ValueError("El archivo no es una imagen válida.")

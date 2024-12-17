@@ -1,8 +1,14 @@
+from io import BytesIO
+
 import torchvision.transforms as transforms
+from PIL import Image
+from werkzeug.datastructures import FileStorage
+
 from ModeloIA.LogicaNegocio.Imagen import Imagen
 import torch
 
 class Preprocesamiento:
+
 
     @staticmethod
     def procesar(imagen: Imagen) -> torch.Tensor:
@@ -39,3 +45,4 @@ class Preprocesamiento:
         imagen_tensor = transformaciones(imagen_pil).unsqueeze(0)  # Agregar dimensión de batch
 
         return imagen_tensor
+

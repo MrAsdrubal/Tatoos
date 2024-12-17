@@ -11,7 +11,7 @@ class BaseDeDatos:
         self.ruta_carpeta_imagenes = ruta_carpeta_imagenes
         self.data = self.cargar_csv()
         # Control del número de tatuajes que retorna.
-        self.num_tattoos_returned = 5
+        self.num_tattoos_returned = 6
     def cargar_csv(self):
         """Carga la base de datos desde el archivo CSV."""
         if not os.path.exists(self.ruta_csv):
