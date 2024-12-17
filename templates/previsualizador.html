@@ -1,9 +1,164 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Previsualizador de Tatuajes</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/previsualizador.css') }}">
+    <style>
+        /* Estilos generales */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: #444;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        /* Botones estilo login */
+        .styled-button {
+            background-color: #c9ab81;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: background 0.3s ease, transform 0.2s ease;
+            width: 100%;
+        }
+
+        .styled-button:hover {
+            background-color: #b29476;
+            transform: translateY(-3px);
+        }
+
+        /* Formulario de subir imagen */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            width: 100%;
+        }
+
+        form input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .tatuajes-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            justify-items: center;
+        }
+
+        .tatuaje-cuadro {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            padding: 10px;
+            width: 180px;
+            height: 220px;
+        }
+
+        .tatuaje-cuadro img {
+            display: block;
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+
+        .instructions-box {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            width: 100%;
+        }
+
+        .instructions-box h3 {
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            color: #444;
+            text-align: center;
+        }
+
+        .instructions-box ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .instructions-box li {
+            padding: 8px 10px;
+            margin-bottom: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #f9f9f9;
+            color: #555;
+        }
+
+        .logout-button {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .logout-button a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #d9534f;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .logout-button a:hover {
+            background-color: #c9302c;
+        }
+    </style>
     <script>
+        // Simula la carga de tatuajes
+        function cargarTatuajes() {
+            const cuadros = document.querySelectorAll('.tatuaje-cuadro img');
+            const loaders = document.querySelectorAll('.tatuaje-cuadro .loader');
+
+            setTimeout(() => {
+                loaders.forEach(loader => loader.style.display = 'none');
+                cuadros.forEach(img => img.style.display = 'block');
+            }, 2000); // Simula 2 segundos de carga
+        }
+
         function previsualizarTatuaje() {
             fetch('/previsualizar_tatuaje', { method: 'POST' })
                 .then(response => response.json())
@@ -16,104 +171,49 @@
                     alert('Error al ejecutar la previsualización del tatuaje.');
                 });
         }
+
+        window.onload = cargarTatuajes;
     </script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9;
-        }
-        .container {
-            display: flex;
-            justify-content: space-between;
-            max-width: 1200px;
-            margin: 20px auto;
-            background: #fff;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-        }
-        .main-content {
-            width: 70%;
-        }
-        .instructions-box {
-            width: 25%;
-            padding: 15px;
-            background-color: #f4f4f4;
-            border: 2px solid #ccc;
-            border-radius: 10px;
-            font-size: 14px;
-            color: #333;
-            box-sizing: border-box;
-            margin-left: 20px;
-            margin-top: 500px; /* Añadido para bajar el cuadro de instrucciones */
-            height: fit-content;
-        }
-        .instructions-box h3 {
-            text-align: center;
-            color: #444;
-            margin-top: 0;
-        }
-        .instructions-box ul {
-            padding-left: 15px;
-            list-style-type: none;
-        }
-        .instructions-box li {
-            margin-bottom: 8px;
-        }
-        button {
-            padding: 10px 20px;
-            background-color: #444;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-    </style>
 </head>
 <body>
     <header>
-        <h1 style="text-align: center;">Previsualizador de Tatuajes para Cuellos</h1>
+        <h1>Previsualizador de Tatuajes para Cuellos</h1>
     </header>
     <div class="container">
-        <!-- Contenido Principal -->
-        <div class="main-content">
+        <!-- Parte Principal -->
+        <div style="flex: 3;">
             <!-- Subir imagen -->
             <form method="post" enctype="multipart/form-data">
                 <label for="imagen">Subir imagen de la piel:</label>
                 <input type="file" name="imagen" id="imagen" required>
-                <button type="submit">Subir</button>
+                <button type="submit" class="styled-button">Subir</button>
             </form>
 
             <!-- Imagen Procesada -->
             {% if uploaded_image %}
+            <div class="image-container">
                 <h2>Imagen procesada:</h2>
-                <img src="{{ url_for('uploaded_file', filename=uploaded_image) }}"
-                    alt="Imagen procesada"
-                    style="width: 619px; height: 362px; object-fit: cover; margin: 0 auto; display: block;">
+                <img src="{{ url_for('uploaded_file', filename=uploaded_image) }}" alt="Imagen procesada">
                 <h3>Tonalidad predicha:</h3>
                 <p>{{ tonalidad_predicha }}</p>
+            </div>
             {% endif %}
 
-            <!-- Título y Cuadro para Tatuaje -->
-            <h2>Tatuaje sugerido por el modelo:</h2>
-            <div style="width: 300px; height: 300px; background-color: #f4f4f4; margin: 20px auto; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center;">
-                {% if tattoo_image %}
-                    <img src="{{ url_for('uploaded_file', filename=tattoo_image) }}" alt="Tatuaje sugerido" style="max-width: 100%; max-height: 100%;">
-                {% else %}
-                    <p>Espacio reservado para el tatuaje</p>
-                {% endif %}
+            <!-- Tatuajes Sugeridos -->
+            <h2>Tatuajes sugeridos por el modelo:</h2>
+            <div class="tatuajes-container">
+                {% for i in range(5) %}
+                <div class="tatuaje-cuadro">
+                    <div class="loader"></div>
+                    <img src="{{ url_for('static', filename='images/default_tattoo.png') }}" alt="Tatuaje recomendado">
+                    <button class="styled-button">Seleccionar Tatuaje</button>
+                </div>
+                {% endfor %}
             </div>
-
-            <!-- Botón para Previsualizar el Tatuaje -->
-            <button onclick="previsualizarTatuaje()">Previsualizar Tatuaje</button>
-
-            <br>
-            <a href="/logout" style="display: block; margin-top: 20px;">Cerrar sesión</a>
+            <button onclick="previsualizarTatuaje()" class="styled-button" style="margin-top: 20px;">Previsualizar Tatuaje</button>
         </div>
 
-        <!-- Instrucciones al Lado Derecho -->
+        <!-- Instrucciones -->
         <div class="instructions-box">
             <h3>Instrucciones del Programa</h3>
             <ul>
@@ -124,6 +224,10 @@
                 <li><strong>Flechas de dirección:</strong> Mover el tatuaje</li>
                 <li><strong>ESC:</strong> Salir del programa</li>
             </ul>
+            <!-- Botón para cerrar sesión -->
+            <div class="logout-button">
+                <a href="/logout">Cerrar sesión</a>
+            </div>
         </div>
     </div>
 </body>

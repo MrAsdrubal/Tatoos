@@ -1,24 +1,145 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <title>Login</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Previsualizador de Tatuajes</title>
+  <style>
+    /* Estilos generales */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Old Standard TT', serif;
+    }
+
+    body {
+      background: url('https://png.pngtree.com/thumb_back/fh260/background/20240522/pngtree-abstract-gold-scratches-on-a-black-background-image_15685278.jpg') no-repeat center center/cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #e0e0e0;
+      backdrop-filter: blur(3px);
+    }
+
+    header {
+      position: absolute;
+      top: 100px; /* Ajustado para bajar el título */
+      text-align: center;
+      width: 100%;
+    }
+
+    header h1 {
+      font-size: 4.5rem; /* Título más grande */
+      text-transform: uppercase;
+      color: #f0d7b9;
+      font-weight: bold;
+      letter-spacing: 3px;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+      font-family: 'Old Standard TT', serif;
+    }
+
+    /* Contenedor principal */
+    .container {
+      background: rgba(15, 15, 15, 0.85);
+      padding: 50px;
+      border-radius: 15px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+      width: 400px;
+      text-align: center;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #f0d7b9;
+      font-size: 1.8rem;
+      font-family: 'Old Standard TT', serif;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    }
+
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #555;
+      border-radius: 5px;
+      background-color: #1f1f1f;
+      color: #e0e0e0;
+      outline: none;
+      font-size: 1.1rem;
+    }
+
+    input::placeholder {
+      color: #aaa;
+      font-family: 'Old Standard TT', serif;
+    }
+
+    button {
+      background-color: #f0d7b9;
+      color: #1f1f1f;
+      padding: 12px;
+      width: 100%;
+      border: none;
+      border-radius: 5px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+      font-family: 'Old Standard TT', serif;
+    }
+
+    button:hover {
+      background-color: #e2c1a5;
+      transform: translateY(-3px);
+    }
+
+    a {
+      color: #f0d7b9;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    a:hover {
+      color: #e0e0e0;
+    }
+
+    p {
+      margin-top: 15px;
+      font-size: 1rem;
+      font-family: 'Old Standard TT', serif;
+      color: #e0e0e0;
+    }
+
+    /* Animaciones */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-<header>
-  <h1>Previsualizador de Tatuajes</h1>
-</header>
-<div class="container">
-  <h2>Iniciar sesión</h2>
-  <form method="post">
-    <input type="text" name="username" placeholder="Usuario" required>
-    <input type="password" name="password" placeholder="Contraseña" required>
-    <button type="submit">Ingresar</button>
-  </form>
-  {% if error %}
-  <p style="color: red; text-align: center;">{{ error }}</p>
-  {% endif %}
-  <p style="text-align: center;">¿No tienes cuenta? <a href="{{ url_for('register') }}">Regístrate aquí</a></p>
-</div>
+  <header>
+    <h1>Previsualizador de Tatuajes</h1>
+  </header>
+  <div class="container">
+    <h2>Iniciar sesión</h2>
+    <form method="post">
+      <input type="text" name="username" placeholder="Usuario" required>
+      <input type="password" name="password" placeholder="Contraseña" required>
+      <button type="submit">Ingresar</button>
+    </form>
+    {% if error %}
+    <p style="color: red; text-align: center;">{{ error }}</p>
+    {% endif %}
+    <p> ¿No tienes cuenta? <a href="{{ url_for('register') }}">Regístrate aquí</a></p>
+  </div>
 </body>
 </html>
