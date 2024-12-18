@@ -178,7 +178,89 @@
             height: 350px;
             overflow: hidden;
         }
+        .tatuaje-cuadro.seleccionado {
+            background: #c39008; /* Color de fondo para seleccionado */
+            box-shadow: 0 0 15px #c39008; /* Resaltar con sombra */
+            border: 2px solid #fff; /* Opcional: añadir un borde blanco */
+        }
+        .tonalidad-container {
+            display: flex;
+            align-items: center; /* Alinear verticalmente */
+            gap: 20px; /* Espacio entre elementos */
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            margin: 20px auto;
+            max-width: 600px;
+        }
 
+        /* Contenedor de texto */
+        .tonalidad-texto {
+            flex: 2; /* Ocupa más espacio */
+            text-align: left;
+        }
+
+        /* Estilo del párrafo destacado */
+        .tonalidad-destacada {
+            font-size: 2.5rem; /* Tamaño grande */
+            font-weight: bold;
+            color: #b29476; /* Dorado */
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Contenedor de la imagen circular */
+        .tonalidad-imagen {
+            flex: 1; /* Ocupa menos espacio */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%; /* Hace el contenedor circular */
+            overflow: hidden; /* Recorta la imagen dentro del círculo */
+            background: #fff; /* Fondo blanco para el círculo */
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Imagen dentro del círculo */
+        .tonalidad-imagen img {
+            width: 100%; /* Ajustar la imagen */
+            height: auto;
+            object-fit: cover;
+        }
+        .tonalidad-container h3 {
+            color: #FFFFFF; /* Color blanco */
+            font-size: 1.5rem; /* Ajusta el tamaño si es necesario */
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5); /* Opcional: sombra para resaltar */
+        }
+        /* Popup flotante en la esquina superior derecha */
+        .popup-notification {
+            position: fixed;
+            top: 20px; /* Separación desde arriba */
+            right: 20px; /* Separación desde la derecha */
+            background: rgba(0, 0, 0, 0.9); /* Fondo oscuro */
+            color: #FFD700; /* Texto dorado */
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000; /* Asegura que esté al frente */
+            opacity: 0; /* Inicia invisible */
+            transform: translateY(-20px); /* Movimiento hacia arriba inicial */
+            transition: opacity 0.5s ease, transform 0.5s ease; /* Efecto de transición */
+        }
+
+        .popup-notification.show {
+            opacity: 1; /* Hace visible */
+            transform: translateY(0); /* Vuelve a su posición normal */
+        }
+        /* Estilo específico para el texto del mensaje */
+        #popup-message {
+            color: #b29476; /* Color del texto de la notificación */
+            margin: 0;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Sutil sombra para resaltar */
+        }
     </style>
     <script>
         function refrescarTatuaje() {
@@ -251,11 +333,11 @@
                 .then(response => response.json())
                 .then(data => {
                     console.log(data.message);
-                    alert(data.message);
+                    mostrarPopup(data.message);
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('Error al ejecutar la previsualización del tatuaje.');
+                    mostrarPopup('Error al ejecutar la previsualización del tatuaje.');
                 });
         }
 
@@ -269,20 +351,52 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.message) {
-                        alert(data.message);
+                        mostrarPopup(data.message);
                         console.log("Ruta de la copia:", data.ruta_copia);
                     } else if (data.error) {
-                        alert("Error: " + data.error);
+                        mostrarPopup("Error: " + data.error);
                         console.error(data.error);
                     }
                 })
                 .catch(error => {
                     console.error("Error al copiar la imagen:", error);
-                    alert("Error al copiar la imagen.");
+                    mostrarPopup("Error al copiar la imagen.");
                 });
+        }
+        function mostrarPopup(mensaje) {
+            const popup = document.getElementById('custom-popup'); // Elemento principal del popup
+            const messageElement = document.getElementById('popup-message'); // Elemento del mensaje
+
+            // Actualiza el mensaje dinámico
+            if (messageElement) {
+                messageElement.textContent = mensaje;
+            }
+
+            // Mostrar el popup
+            popup.classList.add('show'); // Añadir clase 'show' para animación
+            popup.style.display = 'block'; // Asegurar que esté visible
+
+            // Ocultar automáticamente después de 2 segundos
+            setTimeout(() => {
+                popup.classList.remove('show'); // Quitar animación
+                setTimeout(() => {
+                    popup.style.display = 'none'; // Ocultar completamente
+                }, 500); // Espera a que termine la animación de salida
+            }, 2000);
         }
 
         window.onload = cargarTatuajes;
+    </script>
+    <script>
+        function seleccionarTatuaje(button) {
+            // Eliminar la clase "seleccionado" de todos los contenedores
+            document.querySelectorAll('.tatuaje-cuadro').forEach(cuadro => {
+                cuadro.classList.remove('seleccionado');
+            });
+
+            // Añadir la clase "seleccionado" al contenedor del botón clickeado
+            button.parentElement.classList.add('seleccionado');
+        }
     </script>
 </head>
 <body>
@@ -306,8 +420,14 @@
         <img src="{{ url_for('uploaded_file', filename=uploaded_image) }}" alt="Imagen procesada"
              style="width: 619px; height: 362px; object-fit: cover; margin: 0 auto; display: block;">
         <div class="tonalidad-container">
-            <h3>Tonalidad predicha:</h3>
-            <p>{{ tonalidad_predicha }}</p>
+            <div class="tonalidad-texto">
+                <h3>Tonalidad predicha:</h3>
+                <p class="tonalidad-destacada">{{ tonalidad_predicha }}</p>
+            </div>
+            <div class="tonalidad-imagen">
+                <!-- Ruta a la imagen piel2.jpg -->
+                <img src="{{ url_for('uploads', filename='processed/piel2.jpg') }}" alt="Tonalidad Imagen">
+            </div>
         </div>
         {% endif %}
 
@@ -319,7 +439,7 @@
             {% for tatuaje in tatuajes %}
             <div class="tatuaje-cuadro">
                 <img src="{{ tatuaje }}" alt="Tatuaje recomendado" style="width: 150px; height: auto;">
-                <button onclick="prepararTatuaje('{{ tatuaje }}')" class="styled-button">Seleccionar Tatuaje</button>
+                <button onclick="prepararTatuaje('{{ tatuaje }}'); seleccionarTatuaje(this)" class="styled-button">Seleccionar Tatuaje</button>
             </div>
             {% endfor %}
         </div>
@@ -330,26 +450,30 @@
     </div>
 
     <!-- Instrucciones -->
-            <div class="instructions-box">
-                <h3>Instrucciones del Programa</h3>
+    <div class="instructions-box">
+        <h3>Instrucciones del Programa</h3>
 
-                <h3>Botones modelo cuello</h3>
-                <ul>
-                    <li><strong>W, S:</strong> Acercar y alejar modelo</li>
-                    <li><strong>A, D:</strong> Rotación del cuello</li>
-                </ul>
-                <h3>Botones tatuajes</h3>
-                <ul>
-                    <li><strong>LEFT, RIGHT, UP, DOWN:</strong> Movimiento del tatuaje</li>
-                    <li><strong>I, K:</strong> Modificar el alto</li>
-                    <li><strong>J, L:</strong> Modificar ancho</li>
-                    <li><strong>Y, H:</strong> Rotar el tatuaje</li>
-                </ul>
-                <!-- Botón para cerrar sesión -->
-                <div class="logout-button">
-                    <a href="/logout">Cerrar sesión</a>
+        <h3>Botones modelo cuello</h3>
+        <ul>
+            <li><strong>W, S:</strong> Acercar y alejar modelo</li>
+            <li><strong>A, D:</strong> Rotación del cuello</li>
+        </ul>
+        <h3>Botones tatuajes</h3>
+        <ul>
+            <li><strong>LEFT, RIGHT, UP, DOWN:</strong> Movimiento del tatuaje</li>
+            <li><strong>I, K:</strong> Modificar dimensiones de altura</li>
+            <li><strong>J, L:</strong> Modificar dimensiones de anchura</li>
+            <li><strong>Y, H:</strong> Rotar el tatuaje</li>
+        </ul>
+        <!-- Botón para cerrar sesión -->
+        <div class="logout-button">
+            <a href="/logout">Cerrar sesión</a>
         </div>
     </div>
+</div>
+<!-- Popup Notificación -->
+<div id="custom-popup" class="popup-notification" style="display: none;">
+    <p id="popup-message">Mensaje aquí</p>
 </div>
 </body>
 </html>

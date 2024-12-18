@@ -83,7 +83,7 @@ class PrevisualizadorController:
         height, width = image.shape[:2]
 
         # Calcular las coordenadas del recorte central con más zoom
-        zoom_factor = 0.5  # Ajustado para mayor zoom (0.5 recorta más)
+        zoom_factor = 0.4  # Ajustado para mayor zoom (0.5 recorta más)
         new_width = int(width * zoom_factor)
         new_height = int(height * zoom_factor)
 

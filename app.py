@@ -4,6 +4,7 @@ import os
 from controladores.AuthController import AuthController
 from controladores.PrevisualizadorController import PrevisualizadorController
 from modelo.UsersModel import UsersModel
+from flask import Flask, send_from_directory, render_template
 
 # Crear la aplicación principal
 app = Flask(__name__)
@@ -31,6 +32,14 @@ app.add_url_rule('/previsualizar_tatuaje', 'previsualizar_tatuaje', previsualiza
 app.add_url_rule('/preparar_tatuaje', 'preparar_tatuaje', previsualizador_controller.preparar_tatuaje, methods=['POST'])
 app.add_url_rule('/refrescar_tatuaje', 'refrescar_tatuaje', previsualizador_controller.refrescar_tatuaje, methods=['GET', 'POST'])
 
+# Ruta para servir archivos de la carpeta 'uploads'
+@app.route('/uploads/<path:filename>')
+def uploads(filename):
+    return send_from_directory('uploads', filename)
+
+@app.route('/')
+def index():
+    return render_template('previsualizador.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
